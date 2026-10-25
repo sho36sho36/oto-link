@@ -4,6 +4,7 @@ const MIN_SLOT_MS = 48;
 const MAX_SLOT_MS = 96;
 const SLOT_STEP_MS = 2;
 const CONTROL_TONE_RATIO = 0.78;
+const RX_SAMPLE_PHASE_MS = 28;
 const PREAMBLE = [0xd, 0x2, 0xf, 0x0, 0x9, 0x6, 0xa, 0x5, 0x3, 0xc, 0x1, 0xe, 0x4, 0xb, 0x7, 0x8];
 const PROFILE_BASES = [720, 800, 880, 960, 1040];
 const LANE_SPACING_HZ = 600;
@@ -497,12 +498,13 @@ function closestHistoryPoint(target) {
 }
 
 function scorePreamble(point, profile, slotMs) {
-  if (rxHistory.length === 0 || point.time - rxHistory[0].time < (PREAMBLE.length - 1) * slotMs) return null;
+  if (rxHistory.length === 0 || point.time - rxHistory[0].time < (PREAMBLE.length - 1) * slotMs + RX_SAMPLE_PHASE_MS) return null;
   let matches = 0;
   let confidentBits = 0;
   let strength = 0;
   for (let symbol = 0; symbol < PREAMBLE.length; symbol += 1) {
-    const targetTime = point.time - (PREAMBLE.length - 1 - symbol) * slotMs;
+    // Keep all samples inside the steady tone, away from symbol transitions.
+    const targetTime = point.time - RX_SAMPLE_PHASE_MS - (PREAMBLE.length - 1 - symbol) * slotMs;
     const sample = closestHistoryPoint(targetTime);
     if (!sample || Math.abs(sample.time - targetTime) > 9) return null;
     const decoded = decodeNibble(sample.profiles[profile], true);
@@ -834,6 +836,8 @@ document.querySelectorAll("#custom-settings input, #custom-settings select, #vol
 el("repeat-count").addEventListener("change", updateComposer);
 
 updateComposer();
+
+
 
 
 
