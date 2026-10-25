@@ -533,6 +533,15 @@ function abandonCapture(text, tone = "warn") {
   setStatus("receive-status", text, tone);
 }
 
+function bitCount(value) {
+  let count = 0;
+  while (value) {
+    count += value & 1;
+    value >>>= 1;
+  }
+  return count;
+}
+
 function processCapturedNibble(nibble) {
   const capture = rxCapture;
   if (!capture) return;
@@ -545,10 +554,19 @@ function processCapturedNibble(nibble) {
 
   if (capture.bytes.length >= HEADER_LENGTH && capture.expectedLength === null) {
     const bytes = capture.bytes;
-    if (bytes[0] !== 0xa5 || bytes[1] !== 0x5a || bytes[2] !== 2 || (bytes[3] & 0xfe) !== 0) {
-      abandonCapture("フレーム同期に失敗しました · 音を再検出しています");
+    const fixedHeader = [0xa5, 0x5a, 2];
+    for (let index = 0; index < fixedHeader.length; index += 1) {
+      if (bitCount(bytes[index] ^ fixedHeader[index]) > 1) {
+        abandonCapture("フレーム同期に失敗 · 音量と距離を調整して再送してください");
+        return;
+      }
+      bytes[index] = fixedHeader[index];
+    }
+    if (bitCount(bytes[3] & 0xfe) > 1) {
+      abandonCapture("フレーム同期に失敗 · 音量と距離を調整して再送してください");
       return;
     }
+    bytes[3] &= 0x01;
     const cipherLength = (bytes[4] << 8) | bytes[5];
     if (cipherLength > MAX_CIPHER_BYTES || cipherLength < ((bytes[3] & 1) ? 16 : 1)) {
       abandonCapture("受信サイズが範囲外です · 音を再検出しています");
@@ -669,6 +687,15 @@ function addInboxMessage(text, encrypted) {
   inboxList.prepend(card);
 }
 
+function pollReceiver() {
+  if (!rxContext) {
+    rxTimer = null;
+    return;
+  }
+  receiveTick();
+  rxTimer = setTimeout(pollReceiver, 8 + Math.random() * 4);
+}
+
 function receiveTick() {
   if (!rxContext || !rxAnalyser || rxContext.state !== "running") return;
   const point = { time: rxContext.currentTime * 1000, profiles: measureSpectra() };
@@ -740,7 +767,7 @@ async function startListening() {
     source.connect(rxAnalyser);
     rxHistory = [];
     rxCapture = null;
-    rxTimer = setInterval(receiveTick, 8);
+    rxTimer = setTimeout(pollReceiver, 0);
 
     listenButton.disabled = false;
     listenButton.classList.add("listening");
@@ -762,7 +789,7 @@ async function startListening() {
 }
 
 async function stopListening() {
-  clearInterval(rxTimer);
+  clearTimeout(rxTimer);
   rxTimer = null;
   if (rxStream) rxStream.getTracks().forEach((track) => track.stop());
   rxStream = null;
@@ -807,6 +834,8 @@ document.querySelectorAll("#custom-settings input, #custom-settings select, #vol
 el("repeat-count").addEventListener("change", updateComposer);
 
 updateComposer();
+
+
 
 
 
