@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#08131a" />
+    <meta name="description" content="複数の音の高さを使って、近くの端末と短いメッセージを送受信する実験的な音響モデム。" />
+    <title>OTO LINK — 音でデータ通信</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-glow" aria-hidden="true"></div>
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="OTO LINK ホーム">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 34 34" fill="none"><path d="M4 18h4l3-9 5 17 4-13 3 8h7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="17" r="15.5" stroke="currentColor" stroke-opacity=".25"/></svg>
+        </span>
+        <span class="brand-name">OTO<span>LINK</span></span>
+      </a>
+      <div class="top-meta"><span class="protocol-tag">ACOUSTIC DATA LINK</span><span class="version-tag">EXPERIMENT 01</span></div>
+      <a class="github-link" href="https://github.com/sho36sho36/oto-link" target="_blank" rel="noreferrer" aria-label="GitHub プロジェクト">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15.99 1.7 2.6 1.21 3.24.93.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.22 1.15-3-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.06 1.14a10.6 10.6 0 0 1 5.57 0c2.13-1.44 3.06-1.14 3.06-1.14.61 1.54.23 2.68.12 2.96.72.78 1.14 1.78 1.14 3.01 0 4.29-2.61 5.23-5.1 5.5.4.35.75 1.03.75 2.08V22c0 .29.2.63.77.52A11.1 11.1 0 0 0 12 .9Z"/></svg>
+        <span>Project</span><span class="external-arrow">↗</span>
+      </a>
+    </header>
+    <main id="top" class="shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> SOUND AS A DATA CHANNEL <span class="eyebrow-line"></span> 01 / 01</div>
+          <h1>音を、データの<br /><em>通り道に。</em></h1>
+          <p class="hero-lede">4つの音の高さを同時に重ねて、短いメッセージを運びます。<br class="desktop-break" />インターネットにつながず、スピーカーとマイクで端末同士を接続。</p>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="visual-orbit orbit-one"></div><div class="visual-orbit orbit-two"></div>
+          <div class="visual-core"><span class="core-dot"></span></div>
+          <div class="wave wave-a"></div><div class="wave wave-b"></div><div class="wave wave-c"></div>
+          <span class="visual-label label-left">4 CARRIERS</span><span class="visual-label label-right">0 / 1</span>
+          <span class="visual-frequency">880 · 1.48k · 2.08k · 2.68k Hz</span>
+        </div>
+      </section>
+      <div class="workspace-grid">
+        <section class="panel send-panel" aria-labelledby="send-title">
+          <div class="panel-heading">
+            <div class="panel-heading-main"><span class="step-number">01</span><div><p class="panel-kicker">TRANSMIT</p><h2 id="send-title">メッセージを送る</h2></div></div>
+            <span class="direction-icon send-icon" aria-hidden="true">↗</span>
+          </div>
+          <label class="field-label" for="message">MESSAGE <span>最大512バイト</span></label>
+          <div class="message-wrap">
+            <textarea id="message" rows="5" maxlength="512" placeholder="ここにメッセージを書く…" spellcheck="false"></textarea>
+            <div class="text-meta"><span id="byte-count">0 bytes</span><span class="meta-separator">/</span><span id="time-estimate">約 0 秒</span></div>
+          </div>
+          <div class="security-block">
+            <div class="security-heading">
+              <div class="security-icon" aria-hidden="true">⌑</div>
+              <div><strong>メッセージを暗号化</strong><small>AES-256-GCM · PBKDF2</small></div>
+              <label class="switch" aria-label="暗号化を有効にする"><input id="encrypt-toggle" type="checkbox" checked /><span class="switch-track"></span></label>
+            </div>
+            <div id="password-area" class="password-area">
+              <div class="password-input-wrap"><input id="passphrase" type="password" autocomplete="off" placeholder="送受信側で同じ合言葉を入力" /><button id="show-password" class="eye-button" type="button" aria-label="合言葉を表示">◉</button></div>
+              <p class="field-hint">合言葉は音に乗せません。別の手段で相手に伝えてください。</p>
+            </div>
+          </div>
+          <div class="transmit-controls">
+            <div class="volume-control"><label for="volume">OUTPUT</label><input id="volume" type="range" min="0.03" max="0.20" value="0.09" step="0.01" /><span id="volume-value">09</span></div>
+            <button id="send-button" class="primary-button" type="button" disabled><span class="button-icon">↗</span><span>音で送信</span><span class="button-tail">80 ms / symbol</span></button>
+            <button id="stop-send" class="stop-button" type="button" hidden>送信を停止</button>
+          </div>
+          <div id="send-status" class="inline-status" aria-live="polite"><span class="status-dot"></span><span>メッセージを入力してください</span></div>
+        </section>
+        <section class="panel receive-panel" aria-labelledby="receive-title">
+          <div class="panel-heading">
+            <div class="panel-heading-main"><span class="step-number">02</span><div><p class="panel-kicker">RECEIVE</p><h2 id="receive-title">音を受け取る</h2></div></div>
+            <span id="rx-badge" class="rx-badge"><span class="rx-badge-dot"></span> STANDBY</span>
+          </div>
+          <div class="receiver-visual" id="receiver-visual">
+            <div class="receiver-center"><div id="receiver-icon" class="receiver-icon"><span></span><span></span><span></span></div><div id="receiver-state" class="receiver-state">MICROPHONE OFF</div></div>
+            <div class="meter-stack" aria-label="周波数チャンネルの受信レベル">
+              <div class="meter-row"><span>CH 01</span><div class="meter-track"><i></i></div><span>880 / 1080</span></div>
+              <div class="meter-row"><span>CH 02</span><div class="meter-track"><i></i></div><span>1480 / 1680</span></div>
+              <div class="meter-row"><span>CH 03</span><div class="meter-track"><i></i></div><span>2080 / 2280</span></div>
+              <div class="meter-row"><span>CH 04</span><div class="meter-track"><i></i></div><span>2680 / 2880</span></div>
+            </div>
+            <div class="receiver-grid" aria-hidden="true"></div>
+          </div>
+          <div class="receive-actions"><button id="listen-button" class="listen-button" type="button"><span class="mic-symbol">◖</span><span>受信を開始</span><span class="listen-arrow">→</span></button><p id="mic-note">受信中はこのページを開いたままにしてください。</p></div>
+          <div id="receive-status" class="inline-status" aria-live="polite"><span class="status-dot"></span><span>マイクを開始すると受信できます</span></div>
+          <div class="protocol-strip"><div class="protocol-item"><span class="protocol-icon">⌁</span><div><strong>反響への工夫</strong><small>短い無音区間 · 受信タイミングの同期</small></div></div><div class="protocol-item"><span class="protocol-icon checksum-icon">✓</span><div><strong>誤り検出</strong><small>CRC-32 · AES-GCM認証タグ</small></div></div></div>
+        </section>
+      </div>
+      <section class="inbox panel" aria-labelledby="inbox-title">
+        <div class="inbox-heading"><div class="panel-heading-main"><span class="inbox-led"></span><div><p class="panel-kicker">INBOX</p><h2 id="inbox-title">受信したメッセージ</h2></div></div><button id="clear-inbox" class="clear-button" type="button" disabled>履歴をクリア <span>×</span></button></div>
+        <div id="inbox-list" class="inbox-empty"><div class="empty-symbol" aria-hidden="true">∿</div><p>まだメッセージはありません</p><span>受信を開始すると、ここに表示されます。</span></div>
+      </section>
+      <footer class="page-footer"><span>OTO LINK <span class="footer-sep">/</span> ACOUSTIC MODEM PROTOTYPE</span><span><span class="footer-led"></span> BROWSER-TO-BROWSER · NO SERVER</span></footer>
+    </main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
+
+
