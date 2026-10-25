@@ -6,9 +6,6 @@
     <meta name="theme-color" content="#08131a" />
     <meta name="description" content="複数の音の高さを使って、近くの端末と短いメッセージを送受信する実験的な音響モデム。" />
     <title>OTO LINK — 音でデータ通信</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <script src="app.js" defer></script>
   </head>
@@ -64,9 +61,35 @@
               <p class="field-hint">合言葉は音に乗せません。別の手段で相手に伝えてください。</p>
             </div>
           </div>
+          <details id="custom-settings" class="custom-panel">
+            <summary><span>送信をカスタマイズ</span><span class="custom-count">20 SETTINGS</span><span class="custom-chevron">⌄</span></summary>
+            <div class="custom-grid">
+              <div class="custom-field"><label for="symbol-ms">送信速度 <output id="symbol-ms-value">64 ms</output></label><input id="symbol-ms" type="range" min="48" max="96" step="2" value="64" /><small>1シンボルの時間</small></div>
+              <div class="custom-field"><label for="frequency-profile">周波数バンク</label><select id="frequency-profile"><option value="0">LOW · 720 Hz</option><option value="1">MID LOW · 800 Hz</option><option value="2" selected>STANDARD · 880 Hz</option><option value="3">MID HIGH · 960 Hz</option><option value="4">HIGH · 1040 Hz</option></select><small>受信側が自動で判定</small></div>
+              <div class="custom-field"><label for="tone-ratio">発音時間 <output id="tone-ratio-value">78%</output></label><input id="tone-ratio" type="range" min="65" max="92" step="1" value="78" /><small>残りは反響を逃がす無音</small></div>
+              <div class="custom-field"><label for="lane-offset">レーンずらし <output id="lane-offset-value">2 ms</output></label><input id="lane-offset" type="range" min="0" max="3" step="1" value="2" /><small>隣の音を少しずつ遅らせる</small></div>
+              <div class="custom-field"><label for="waveform">波形</label><select id="waveform"><option value="sine" selected>サイン波 · 標準</option><option value="triangle">三角波 · 聞き取りやすい</option></select><small>音の出方</small></div>
+              <div class="custom-field"><label for="volume">全体の音量 <output id="volume-value">09</output></label><input id="volume" type="range" min="0.03" max="0.20" value="0.09" step="0.01" /><small>出力レベル</small></div>
+              <div class="custom-field"><label for="lane-gain-0">CH 01 音量 <output id="lane-gain-0-value">100%</output></label><input id="lane-gain-0" type="range" min="40" max="125" step="5" value="100" /><small>レーンごとのバランス</small></div>
+              <div class="custom-field"><label for="lane-gain-1">CH 02 音量 <output id="lane-gain-1-value">100%</output></label><input id="lane-gain-1" type="range" min="40" max="125" step="5" value="100" /><small>レーンごとのバランス</small></div>
+              <div class="custom-field"><label for="lane-gain-2">CH 03 音量 <output id="lane-gain-2-value">100%</output></label><input id="lane-gain-2" type="range" min="40" max="125" step="5" value="100" /><small>レーンごとのバランス</small></div>
+              <div class="custom-field"><label for="lane-gain-3">CH 04 音量 <output id="lane-gain-3-value">100%</output></label><input id="lane-gain-3" type="range" min="40" max="125" step="5" value="100" /><small>レーンごとのバランス</small></div>
+              <div class="custom-field"><label for="attack-ms">立ち上がり <output id="attack-ms-value">3 ms</output></label><input id="attack-ms" type="range" min="0" max="10" step="1" value="3" /><small>音の始まりをなめらかに</small></div>
+              <div class="custom-field"><label for="release-ms">立ち下がり <output id="release-ms-value">3 ms</output></label><input id="release-ms" type="range" min="0" max="10" step="1" value="3" /><small>音の終わりをなめらかに</small></div>
+              <div class="custom-field"><label for="lead-delay">開始前の待ち時間 <output id="lead-delay-value">300 ms</output></label><input id="lead-delay" type="range" min="0" max="3000" step="100" value="300" /><small>受信側を先に待機させる</small></div>
+              <div class="custom-field toggle-field"><label for="loop-toggle">連続ループ</label><label class="switch"><input id="loop-toggle" type="checkbox" /><span class="switch-track"></span></label><small>停止するまで同じフレームを再送</small></div>
+              <div class="custom-field"><label for="repeat-count">送信回数</label><select id="repeat-count"><option value="0" selected>∞ · 無限</option><option value="2">2 回</option><option value="3">3 回</option><option value="5">5 回</option><option value="10">10 回</option></select><small>ループ有効時に使用</small></div>
+              <div class="custom-field"><label for="max-loop-ms">最大ループ時間</label><select id="max-loop-ms"><option value="0" selected>無制限</option><option value="60000">1 分</option><option value="120000">2 分</option><option value="300000">5 分</option><option value="600000">10 分</option></select><small>時間が来たら次の再送を停止</small></div>
+              <div class="custom-field"><label for="repeat-gap">繰り返し間隔 <output id="repeat-gap-value">800 ms</output></label><input id="repeat-gap" type="range" min="0" max="3000" step="100" value="800" /><small>フレーム間の無音時間</small></div>
+              <div class="custom-field"><label for="gap-jitter">間隔のゆらぎ <output id="gap-jitter-value">0 ms</output></label><input id="gap-jitter" type="range" min="0" max="500" step="50" value="0" /><small>反響が残る環境で調整</small></div>
+              <div class="custom-field toggle-field"><label for="clear-after-send">送信後に入力を消去</label><label class="switch"><input id="clear-after-send" type="checkbox" /><span class="switch-track"></span></label><small>正常に送れたとき</small></div>
+              <div class="custom-field"><label for="pan">左右バランス <output id="pan-value">中央</output></label><input id="pan" type="range" min="-100" max="100" step="10" value="0" /><small>ステレオ出力に対応</small></div>
+            </div>
+            <p class="custom-note">受信側は同期プリアンブルから速度と周波数バンクを自動判定します。連続送信中も、受信側では同じメッセージを重複表示しません。</p>
+          </details>
           <div class="transmit-controls">
-            <div class="volume-control"><label for="volume">OUTPUT</label><input id="volume" type="range" min="0.03" max="0.20" value="0.09" step="0.01" /><span id="volume-value">09</span></div>
-            <button id="send-button" class="primary-button" type="button" disabled><span class="button-icon">↗</span><span>音で送信</span><span class="button-tail">80 ms / symbol</span></button>
+
+            <button id="send-button" class="primary-button" type="button" disabled><span class="button-icon">↗</span><span>音で送信</span><span id="send-speed-label" class="button-tail">64 ms / symbol</span></button>
             <button id="stop-send" class="stop-button" type="button" hidden>送信を停止</button>
           </div>
           <div id="send-status" class="inline-status" aria-live="polite"><span class="status-dot"></span><span>メッセージを入力してください</span></div>
@@ -79,14 +102,14 @@
           <div class="receiver-visual" id="receiver-visual">
             <div class="receiver-center"><div id="receiver-icon" class="receiver-icon"><span></span><span></span><span></span></div><div id="receiver-state" class="receiver-state">MICROPHONE OFF</div></div>
             <div class="meter-stack" aria-label="周波数チャンネルの受信レベル">
-              <div class="meter-row"><span>CH 01</span><div class="meter-track"><i></i></div><span>880 / 1080</span></div>
-              <div class="meter-row"><span>CH 02</span><div class="meter-track"><i></i></div><span>1480 / 1680</span></div>
-              <div class="meter-row"><span>CH 03</span><div class="meter-track"><i></i></div><span>2080 / 2280</span></div>
-              <div class="meter-row"><span>CH 04</span><div class="meter-track"><i></i></div><span>2680 / 2880</span></div>
+              <div class="meter-row"><span>CH 01</span><div class="meter-track"><i></i></div><span data-frequency-lane="0">880 / 1080</span></div>
+              <div class="meter-row"><span>CH 02</span><div class="meter-track"><i></i></div><span data-frequency-lane="1">1480 / 1680</span></div>
+              <div class="meter-row"><span>CH 03</span><div class="meter-track"><i></i></div><span data-frequency-lane="2">2080 / 2280</span></div>
+              <div class="meter-row"><span>CH 04</span><div class="meter-track"><i></i></div><span data-frequency-lane="3">2680 / 2880</span></div>
             </div>
             <div class="receiver-grid" aria-hidden="true"></div>
           </div>
-          <div class="receive-actions"><button id="listen-button" class="listen-button" type="button"><span class="mic-symbol">◖</span><span>受信を開始</span><span class="listen-arrow">→</span></button><p id="mic-note">受信中はこのページを開いたままにしてください。</p></div>
+          <div class="receive-actions"><button id="listen-button" class="listen-button" type="button"><span class="mic-symbol">◖</span><span>受信を開始</span><span class="listen-arrow">→</span></button><p id="mic-note">速度と周波数バンクは自動判定。ページを開いたままにしてください。</p></div>
           <div id="receive-status" class="inline-status" aria-live="polite"><span class="status-dot"></span><span>マイクを開始すると受信できます</span></div>
           <div class="protocol-strip"><div class="protocol-item"><span class="protocol-icon">⌁</span><div><strong>反響への工夫</strong><small>短い無音区間 · 受信タイミングの同期</small></div></div><div class="protocol-item"><span class="protocol-icon checksum-icon">✓</span><div><strong>誤り検出</strong><small>CRC-32 · AES-GCM認証タグ</small></div></div></div>
         </section>
@@ -100,6 +123,11 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
   </body>
 </html>
+
+
+
+
+
 
 
 
